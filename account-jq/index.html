@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="content-type" content="text/html">
+<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>记账本</title>
+<link type="text/css" rel="stylesheet" href="css/index.css">
+<script src="js/jquery-3.3.1.js"></script>
+<script src="js/index.js"></script>
+</head>
+<body>
+	<div id="header">
+		<a href="index.html" id="header-left">账目列表</a>
+		<a href="account.html" id="header-right">账目统计</a>
+	</div>
+	<div id="edit-page">
+		<ul id="edit-item" class="event-item">
+			<li class="event-time"><input id="edit-time" type="text"">
+			</li>
+			<li class="event-description">
+				<span class="event"><input id="edit-event" type="text" placeholder="请填写要修改的事项"></span>
+				<span class="money"><input id="edit-money" type="text" placeholder="请填写要修改的金额"></span>
+			<input type="button" id="edit-save" value="保存">
+			</li>
+		</ul>
+	</div>
+ 	<div id="list-item">
+	</div>
+	<a href="add.html" id="btn-add">+</a>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="content-type" content="text/html">
+<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>记账本</title>
+<link href="css/add.css" rel="stylesheet">
+<script src="js/jquery-3.3.1.js"></script>
+<script src="js/add.js"></script>
+</head>
+<body>
+    <div id="header">
+    	<a id="header-article">新建记账</a>
+    	<a id="header-return">←</a>
+    </div>
+
+    <div id="preview">
+        <div id="preview-img"></div>
+        <div id="preview-msg">
+    	    <div id="preview-event">事项：</div>
+    	    <div id="preview-money">金额：</div>
+        </div>
+
+        <div id="preview-delete"><span>&times;</span></div>
+    </div>
+
+    <div id= "event-type-area">
+    	<span>选择账目类型</span>
+
+    		<ul id="event-type">
+    		    <li><img src="img/food.png" data-type="food"><br/>饮食</li>
+    		    <li><img src="img/life.png" data-type="life"><br/>日用</li>
+    		    <li><img src="img/entertainment.png" data-type="entertainment"><br/>文娱</li>
+    		    <li><img src="img/other.png" data-type="other"><br/>其他</li>
+    		    <li><img src="img/income.png" data-type="income"><br/>收入</li>
+    	    </ul>
+
+    </div>
+
+    <div id="input-area">
+    	<div>
+    		<span>事项</span>
+    		<input id="event" type="text" maxlength="9">
+    	</div>
+    	<div>
+    		<span>金额</span>
+    		<input type="text" id="money" maxlength="9">
+    	</div>
+    	<input type="button" value="保存" id="btn-save">
+    </div>
+        <div></div>
+	
+</body>
+</html>

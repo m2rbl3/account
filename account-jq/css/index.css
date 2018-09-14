@@ -1,0 +1,202 @@
+@charset "UTF-8";
+/*css重置*/
+html,body,ul,li.input{
+	margin: 0px;
+	padding: 0px;
+}
+
+ul,li{
+	list-style: none;
+}
+
+input[type="button"]{
+	border:none;
+	cursor: pointer;
+
+}
+
+a{
+    text-decoration: none;
+}
+
+html,body{
+	height:100%;
+}
+
+/*编辑页面*/
+#edit-page{
+	width: 100%;
+	position: absolute;
+	top:50px;bottom:0px;
+	display: none;
+	background-color: #fff;
+	z-index: -1;
+}
+
+#edit-item{
+	position: absolute;
+	top: 50%;left:0px;right: 0px;
+	transform: translateY(-50%);
+}
+
+#edit-time{
+	height:20px;
+	line-height: 20px;
+	background-color:transparent;
+	color:#fff;
+	outline: none;
+	border: none;
+	vertical-align: top;
+	opacity: 0.5;
+	text-align: center;
+}
+
+
+#edit-time::selection{
+	background:#F73A3A;
+}
+
+#edit-time::-moz-selection{
+	background:#F73A3A;
+}
+
+#edit-money,#edit-event{
+	width: 50%;
+	text-align:center;
+}
+
+#edit-save{
+	background-color: #556DFD;
+	height:30px;
+	width:50%;
+	text-align: center;
+	border-radius: 5px;
+	border:none;
+	position:relative;
+	background-color: #347FCD;
+	color:#fff;
+}
+
+#edit-save:hover{
+	background-color: #3A94F2;
+}
+
+/*标题栏*/
+#header{
+	overflow: hidden;
+	z-index: 3;
+}
+
+#header a{
+	display: inline-block;	
+	height: 50px;
+	line-height: 50px;
+	width: 50%;
+	float: left;
+	text-align: center;
+	cursor: pointer;
+	color: #FFF;
+}
+
+#header a:hover{
+	background-color: #074D7C;
+}
+
+#header-left{
+	background-color: #4AA5E9;
+}
+
+#header-right{
+	background-color: #1271C1;
+}
+
+/*记账按键*/
+#btn-add{
+	display: block;
+	width: 50px;
+	height: 50px;
+	line-height: 50px;
+	font-size: 20px;
+	text-align: center;
+	border-radius: 25px;
+	background: yellow;
+	position: fixed;
+	right: 10%;bottom: 10%;
+	cursor: pointer;
+}
+
+#btn-add:active{
+	color: #000;
+}
+
+#btn-add:hover{
+	background-color: #EAE739;
+}
+
+/*账单展示*/
+#list-item{
+	height:100%;
+	overflow: auto;
+}
+
+.event-item{
+	display: block;
+	margin: 10px;
+	box-shadow: 0px 2px 5px gray;
+	text-align:center;
+}
+
+.event-time{
+	height: 20px;
+	background: linear-gradient( 90deg,#4AA5E9 0%,#1271C1 60% );
+	text-align: center;
+	color: #FFF;
+}
+
+.event-description{
+	line-height: 40px;
+	font-size: 20px;
+	position: relative;
+}
+
+.event-description>span{
+	display: block;
+}
+
+.item-pic{
+	position:absolute;
+	top:50%; bottom:50%;left:5%;
+	height:50%;
+	transform: translateY(-50%);
+
+}
+.item-delete{     /*删除按钮样式*/
+	position:absolute;
+	top:50%; right:5%;
+	transform: translateY(-50%);
+	width: 13%;
+	cursor: pointer;
+	border-radius: 5px;
+	background-color: #FC0707;
+	color:#FFF;
+	text-align: center;
+}
+.item-delete:hover{
+    background-color: #D71919;
+}
+
+.item-edit{
+	position: absolute;
+	top:50%;right:19%;
+	transform: translateY(-50%);
+	width:13%;
+	cursor: pointer;
+	background-color: #3F7BDE;
+	border-radius: 5px;
+	color:#FFF;
+	text-align: center;
+}
+
+.item-edit:hover{
+	background-color: #1A62D7;
+}

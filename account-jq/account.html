@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="content-type" content="text/html">
+<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>账目统计</title>
+<link type="text/css" rel="stylesheet" href="css/account.css">
+<script src="js/jquery-3.3.1.js"></script>
+<script src="js/account.js"></script>
+</head>
+<body>
+    <div id="header">
+		<a href="index.html" id="header-left">账目列表</a>
+		<a href="account.html" id="header-right">账目统计</a>
+	</div>
+
+	<div id="container">
+	    <div>
+		    <span>支出占比图</span>
+		    <ul id="event-type-list">
+		    	<li class="event-type"><span style="background-color:#F44C53"></span>饮食</li>
+		    	<li class="event-type"><span style="background-color:#EC48BD"></span>日用</li>
+		    	<li class="event-type"><span style="background-color:#464AEB"></span>文娱</li>
+		    	<li class="event-type"><span style="background-color:#1B9382"></span>其他</li>
+		    	<!-- <li class="event-type"><span style="background-color:#299835"></span>收入</li> -->
+		    </ul>
+		    <canvas id="circle"  height="200px" width="200px"></canvas>
+		</div>
+		<div>
+			<span>月收入折线图</span>
+			<ul id="income-list"></ul>
+			<canvas id="line-chat" height="230px" width="270px"></canvas>
+		</div>
+    </div>
+		<a href="add.html" id="btn-add">+</a>
+</body>
+</html>

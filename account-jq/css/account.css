@@ -1,0 +1,111 @@
+@charset "UTF-8";
+/**
+ * 
+ * @authors Your Name (you@example.org)
+ * @date    2018-05-06 23:37:28
+ * @version $Id$
+ */
+html,body,ul,li{
+	margin: 0px;
+	padding: 0px;
+}
+
+ul,li{
+	list-style: none;
+}
+
+a{
+	text-decoration: none;
+}
+
+html,body{
+	height:100%;
+}
+/*screen weight>768px*/
+/*@media only screen and (min-width: 768px) {*/
+
+/*标题*/
+#header{
+	overflow: hidden;
+}
+
+#header a{
+	display: inline-block;	
+	height: 50px;
+	line-height: 50px;
+	width: 50%;
+	float: left;
+	text-align: center;
+	vertical-align: center;
+	cursor: pointer;
+	color: #FFF;
+}
+
+#header a:hover{
+	background-color: #074D7C;
+}
+
+#header-left{
+	background-color: #4AA5E9;
+}
+
+#header-right{
+	background-color: #1271C1;
+}
+/*饼图和折线图*/
+#container{
+  width: 75%;
+	overflow: auto;
+}
+
+#container>div{
+	text-align: center;
+	margin: 20px 0;
+}
+#container>div>span{
+	display: block;
+}
+.event-type{
+	display: inline-block;
+}
+
+.event-type>span{
+	display: inline-block;
+	height: 16px;
+	width:16px;
+	border-radius: 8px;
+	vertical-align: -2px;
+}
+
+/*每月收入*/
+#income-list{
+	margin:10px 0px;
+}
+
+#income-list>li{
+	display: inline-block;
+	margin:0px 5%;
+}
+/*记账按钮*/
+#btn-add{
+	display: block;
+	width: 50px;
+	height: 50px;
+	line-height: 50px;
+	font-size: 20px;
+	text-align: center;
+	border-radius: 25px;
+	background: yellow;
+	position: fixed;
+	right: 10%;bottom: 10%;
+	cursor: pointer;
+}
+
+#btn-add:active{
+	color: #000;
+}
+
+#btn-add:hover{
+	background-color: #EAE739;
+}
+

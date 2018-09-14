@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>记账本</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/4.1.0/css/bootstrap.css">
+<link rel="stylesheet" href="app.css">
+<script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+<script src="Vue-touch.js"></script>
+</head>
+
+<body>
+	<div class="container-fluid" id="account-app">
+		<div v-swiperight="{fn:ejectMenu,val:true}">
+		<status-bar ref="statusBar":is-eject-menu="isEjectMenu" :current-page="currentPage"></status-bar>
+		<component :account-data="account" :is="currentPage"></component>
+		</div>
+		<transition name="bg-menu">
+			<bg-menu v-show="isEjectMenu"></bg-menu>
+		</transition>
+		<transition name="left-menu">
+    		<left-menu v-show="isEjectMenu" v-swipeleft="{fn:ejectMenu,val:false}"></left-menu>
+    	</transition>
+    	</div>
+    <script>
+
+    	var leftMenu= {
+    		methods: {
+    			switchPage:function(val){
+    				this.$parent.$emit("eject-menu",false);
+    				this.$parent.$emit("switch-page",val);
+    			}
+    		},
+    		template:
+    		`<div class="bg-white" id="left-menu">
+    			<div class="row bg-info text-center status-bar-left-menu"></div>
+    			<div class="row flex-column-center menu-item cursor-pointer" @click="switchPage('accountList')">账目列表</div>
+    			<div class="row flex-column-center menu-item cursor-pointer"  @click="switchPage('accountStatistics')">账目统计</div>
+    		</div>`
+    	}
+
+    	var bgMenu={
+    		template:  			
+    		    `<div>
+    				<div id="bg-menu"></div>
+				</div>`
+    	}
+
+    	var statusBar={
+    		data:function(){
+    			return{
+    				isAdd:true
+    			}
+    		},
+    		props:['currentPage','isEjectMenu'],
+    		methods:{
+    			switchPage:function(val){
+    				this.$parent.$emit('switch-page',val);
+    			},
+    			ejectMenu:function(){
+    				this.$parent.$emit('eject-menu',!this.isEjectMenu);
+    			}
+    		},
+    		computed:{
+    			title:function(){
+    				if(this.currentPage=="indexOfApp")
+    						return '账目列表';
+    				else if(this.currentPage=="showAccount")
+    						return '账目展示';
+    				else if(this.currentPage=="addAccount")
+    						return '添加账单';
+    			},
+    		},
+    		template:
+    		`<div>
+		    	<div class="row bg-info text-center status-bar">
+		    		<div id="btn-menu" class="cursor-pointer" @click="ejectMenu">
+		    			<div></div>
+		    		</div>
+					<div class="text-white flex-column-center col-12">{{title}}</div>
+				</div>
+				<div v-show="isAdd" id="btn-add" class="cursor-pointer text-white btn-danger" @click="switchPage('addAccount')">+</div>
+			</div>`
+    	}
+
+    	var indexOfApp={
+    		data:function(){
+    			return {
+    				src:'background-image:none',
+    				showEdit:[],
+    				eventOfChange:undefined,
+    				moneyofChange:undefined
+    			}
+    		},
+    		props:["accountData"],
+    		computed:{
+    			account:function(){
+    				return this.accountData;
+    			}
+    		},
+    		beforeMount:function(){ 
+    					for(var i=0,len=this.accountData.length;i<len;i++){
+    						Vue.set(this.showEdit,i,false);
+    				}
+    		},
+    		methods:{
+    			handleDelete:function(index){
+    				this.account.splice(index,1);
+    				localStorage.setItem("account",JSON.stringify(this.account));
+    				this.$parent.$emit("reload-page");
+    			},
+    			handleEdit:function(index){
+    				// Vue.set(this.showEdit,index,true);
+    			},
+    			handleSave:function(index){
+    				if(this.eventOfChange!=undefined && typeof this.moneyOfChange!='number'){
+    					var eventCache=this.eventOfChange[index];
+    					var moneyCache=this.moneyOfChange[index];
+    					Vue.set(this.account[index],'event',eventCache);
+    					Vue.set(this.account[index],'money',moneyCache);
+    					localStorage.setItem("account",JSON.stringify(this.account));
+    					this.$parent.$emit("reload-page");
+    				}
+    				else alert("请输入正确事件或者金额");
+    			},
+    			editBind:function(type,event,index){
+    				if(type=="event")
+    					this.eventOfChange=event.target.value;
+					else if(type=="money")
+						this.moneyOfChange=event.target.value;
+    			}
+    			// editBind:function(type,event,index){
+    			// 	if(type=="event")
+    			// 		this.eventOfChange.splice(index,1,event.target.value);
+    			// 	else if(type=="money")
+    			// 		this.moneyOfChange.splice(index,1,Number(event.target.value));
+    			// }
+
+    		},
+    		template:
+					// `<div id="edit-page">
+					// 	<ul id="edit-item" class="event-item">
+					// 		<li class="event-time"><input id="edit-time" type="text"">
+					// 		</li>
+					// 		<li class="event-description">
+					// 			<span class="event"><input id="edit-event" type="text" placeholder="请填写要修改的事项"></span>
+					// 			<span class="money"><input id="edit-money" type="text" placeholder="请填写要修改的金额"></span>
+					// 		<input type="button" id="edit-save" value="保存">
+					// 		</li>
+					// 	</ul>
+					// 	</div>
+ 					`<div class="list-wrap">
+ 						<div class="card index-card" v-for="(account,index) in accountData"  :key="account.time">
+ 							<div class="card-head bg-info text-white text-center">{{account.time}}</div>
+ 							<div class="card-body row">
+ 								<div class="col-4 col-md-2 flex-column-center">
+ 									<div class="fluid-img" :style="account.type==undefined?'background-image:none':'background-image:url(img/'+account.type+'.png);'"></div>
+ 								</div>
+
+ 								<div v-if="showEdit[index]" class="col-8 col-md-4 offset-md-2 flex-column-center">
+ 									<div class="flex-column-center">
+ 										<span>事项：<input type='text'
+ 										@input='editBind("event",$event,index)'></input></span>
+ 									</div>
+ 									<div class="flex-column-center">
+ 										<span>金额：<input type='text'
+ 										@input='editBind("money",$event,index)'></input></span>
+ 									</div>
+ 								</div>
+
+ 								<div v-else class="col-8 col-md-4 offset-md-2 flex-column-center">
+ 									<div class="flex-column-center">
+ 										<span>事项：{{account.event}}</span>
+ 									</div>
+ 									<div class="flex-column-center">
+ 										<span>金额：{{account.money}}</span>
+ 									</div>
+ 								</div>
+
+ 								<div class="col-md-4 flex-row-center">
+ 									<button type="button" class="col-md-2 btn btn-info btn-index flex-row-center" @click="handleSave(index)" v-if="showEdit[index]">保存</button>
+ 									<button type="button" class="col-md-2 btn btn-info btn-index flex-row-center" @click="handleEdit(index)" v-else>编辑</button>
+
+    	    						<button class="col-md-2 btn btn-danger flex-row-center btn-index" @click="handleDelete(index)">&times;</button>
+    	    					</div>
+ 							</div>
+ 						</div>
+ 					</div>`
+    	}
+
+    	var previewOfaddAccount={
+    		data:function(){
+    			return{
+    				src:"background-image:none"
+    			}
+    		},
+    		props:[	'accountType',
+					'accountEvent',
+					'accountMoney',
+				  ],
+    		watch:{
+    			accountType:function(){
+    				if(this.accountType!==undefined){
+    					this.src= 'background-image:url(img/'+this.accountType+'.png)';
+    				}
+    				else this.src= "background-image:none";
+    			}
+    		},
+    		methods:{
+    			handleDelete:function(){
+    				this.$parent.$emit("handle-delete");
+    			}
+    		},
+    		template:`
+            <div class="text-center">
+    			<div id="preview" class="card">
+    				<div class="card-body row">
+    						<div class="col-3 flex-column-center">
+    							<div id="preview-img" class="fluid-img" :style="src"></div>
+    						</div>
+    					<div id="preview-msg" class="col-7">
+    		 					<div id="preview-event" class="row">事项：{{accountEvent}}</div>
+    						<div id="preview-money" class="row">金额：{{accountMoney}}</div>
+    					</div>
+    					<div class="col-1 flex-column-center">
+    						<button type="button" class=" btn btn-danger flex-column-center" @click="handleDelete">&times;</button>
+    					</div>
+    				</div>
+    			</div>
+    		   </div>`
+    	};
+
+    	var chooseTypeOfaddAccount={
+    		data:function(){
+				return{
+					typeOfEvent:[{src:"food",name:"饮食"},{src:"life",name:"日用"},{src:"entertainment",name:"娱乐"},{src:"other",name:"其它"},{src:"income",name:"收入"}],isBorder:[],accountTypeCp2:undefined
+				}
+			},
+			props:['accountType'],
+			computed:{
+				accountTypeCp:{
+					get:function(){
+						return this.accountType;
+					},
+					set:function(val){
+						this.accountTypeCp2=val;
+					}
+				}
+			},
+			methods:{
+				handleEventType:function(itemType,index){
+					for(var i=0,len=this.isBorder.length;i<len;i++){
+						Vue.set(this.isBorder,i,false);
+					}
+					if(this.accountTypeCp2===undefined || this.accountTypeCp2!=itemType){
+						this.accountTypeCp=itemType;
+						Vue.set(this.isBorder,index,true);
+					}
+					else 
+						this.accountTypeCp=undefined;
+					this.$parent.$emit("handle-account","type",this.accountTypeCp2);
+    			}
+			},
+    		template:`
+            <div class="card">
+    			<span class=" card-head text-center">选择账目类型</span>
+    				<ul class="card-body row" id="event-type">
+    					<li class="col flex-column-center" v-for="(item,index) of typeOfEvent" 
+                        @click="handleEventType(item.src,index)">
+    						<div :style="'background-image:url(img/'+item.src+'.png'" :class="{border:isBorder[index]}" class="round fluid-img">
+    						</div>
+    						<br/>{{item.name}}
+    					</li>
+    			  		</ul>
+    	  </div>`
+    	};
+
+    	var formOfaddAccount= {
+    		props:['accountEvent','accountMoney'],
+    		methods:{
+    			handleAccount:function(type,event){
+    				this.$parent.$emit("handle-account",type,event.target.value);
+    			},
+    			saveAccount:function(){
+    				this.$parent.$emit("save-account");
+    			}
+    		},
+    		template:`
+            <form class="card">
+				<div class="card-body form-group text-center">
+					<div class="row form-compoonent">
+						<label class="col-md-2 mx-auto" for="event">事项</label>
+							<input type="text" class="col-md-10 form-control" id="event" @input="handleAccount('event',$event)" :value="accountEvent"> 
+					</div>
+					<div class="row form-compoonent">
+						<label class="col-md-2 mx-auto" for="money">金额</label>
+							<input type="text" class="col-md-10 form-control" id="money" :value="accountMoney"
+							@input="handleAccount('money',$event)">
+					</div>
+					<div class="btn btn-primary cursor-pointer mx-auto" @click="saveAccount">提交</div>
+					</div>
+				</form>`
+    	};
+
+		var addAccount={
+			data:function(){
+				return{
+					newAccount:{},
+					accountType:undefined,
+					accountEvent:undefined,
+					accountMoney:undefined
+				}
+			},
+			watch:{
+				accountType:function(){
+					Vue.set(this.newAccount,"type",this.accountType);
+				},
+				accountEvent:function(){
+					Vue.set(this.newAccount,"event",this.accountEvent);
+				},
+				accountMoney:function(){
+					Vue.set(this.newAccount,"money",this.accountMoney);
+				}
+			},
+			methods:{
+				handleAccount:function(type,value){
+					switch(type){
+						case "money":this.accountMoney=value;break;
+						case "event":this.accountEvent=value;break;
+						case "type":this.accountType=value;break;
+					}
+				},
+
+				handleDelete:function(){	
+					this.accountType=undefined;
+					this.accountEvent=undefined;
+					this.accountMoney=undefined;
+					for(var i=0,isBorder=this.$refs.chooseType.isBorder,len=isBorder.length;i<len;i++){
+						Vue.set(isBorder,i,false);
+					}
+				},
+
+				saveAccount:function(){
+					if(this.newAccount.event===undefined)
+						alert("请填写事件");
+					else if(/^(\d+)(\.\d+)?$/.test(this.newAccount.money)==false){
+						if(this.newAccount.money===undefined)
+							alert("请填写金额");
+						else 
+							alert("金额请填写数字");				
+				    }
+					else if(this.newAccount.type===undefined)
+						alert("请选择事件类型");
+					else {
+						var oTime=new Date();
+						Vue.set(this.newAccount,"time",oTime.toLocaleString());
+						Vue.set(this.newAccount,"year",oTime.getFullYear());
+						Vue.set(this.newAccount,"month",oTime.getMonth()+1);
+
+						var newAccount=this.newAccount;
+						if(localStorage.getItem("account")===null)
+							localStorage.setItem("account","[]");
+						var arr=JSON.parse(localStorage.account);
+						arr.push(newAccount);
+						arr=JSON.stringify(arr);
+						localStorage.setItem("account",arr);
+
+					 this.$parent.$emit("reload-page");				
+					 this.$parent.$emit("switch-page","accountList");
+					}	
+				},
+    	    },
+    	    created:function(){
+    	    	this.$on("handle-account",this.handleAccount);
+    	    	this.$on("handle-delete",this.handleDelete);
+    	    	this.$on("save-account",this.saveAccount);
+    	    },
+			components:{
+				previewOfaddAccount,chooseTypeOfaddAccount,formOfaddAccount
+			},
+			template:`<div>`
+					  +`<previewOfaddAccount ref="preview" :newAccount="newAccount" :account-type="accountType" :account-money="accountMoney" :account-event="accountEvent"></previewOfaddAccount>`
+					  +`<chooseTypeOfaddAccount ref="chooseType" :account-type="accountType"></chooseTypeOfaddAccount>`
+                      +`<formOfaddAccount ref="form" :account-event="accountEvent" :account-money="accountMoney"></formOfaddAccount>`
+                      +`</div>`		
+		};
+
+		var showAccount={
+			data:function(){
+				return{
+					payment:[],allPayment:0,dateArr:[],percent:[0,0,0,0],percentCache:[0,0,0,0]
+				}
+			},
+			props:['accountData'],
+			mounted:function(){
+					this.accountCost();
+					this.getPercent();
+					this.drawCircle();
+					this.drawLineChat();				
+			},
+		    watch:{
+		    	percent:function(){
+		    		for(var i=0,len=this.percent.length;i<len;i++){
+		    			if(this.percent[i]){
+		    				var cache=Number(this.percent[i])*100;
+		    			    Vue.set(this.percentCache,i,cache.toFixed(2));
+		    			}
+		    		}
+				}
+			},
+			methods:{
+				accountCost:function(){
+					var countFood=0,countLife=0,countEntertainment=0,countOther=0,countIncome=0,item;
+				 	for(var i=0,len=this.accountData.length;i<len;i++){
+				 		item=this.accountData[i];
+				 		if(item.type!==undefined && item.money!==undefined)
+				 		switch(item.type){
+				 			case "food":
+				 				countFood=Number(item.money);break;
+				 			case "life":
+                        		countLife+=Number(item.money);break;
+                    		case "entertainment":
+                    			countEntertainment+=Number(item.money);break;
+                    		case "other":
+                	    		countOther+=Number(item.money);break;
+				 		}
+				 		if(item.time!==undefined && item.type=="income"){
+                		    var year=item.year,month=item.month,money=item.money;
+                   			if(this.dateArr[year]==undefined){
+                   	    		Vue.set(this.dateArr,year,[]);
+                   			} 
+                    		if(this.dateArr[year][month]==undefined){
+                    			Vue.set(this.dateArr[year],month,[]);
+                    	    	Vue.set(this.dateArr[year][month],"money",0);
+                    		}
+                    		var dateArrCache=this.dateArr[year][month]["money"]
+                    		Vue.set(this.dateArr[year][month],"money",dateArrCache+Number(item.money));
+                		}
+					}
+					this.payment.push(countFood,countLife,countEntertainment,countOther);
+					this.allPayment=countFood+countLife+countEntertainment+countOther;
+				},
+
+				getPercent:function(){
+					var allCount=this.allPayment;
+					for(var i=0,len=this.payment.length;i<len;i++){
+						Vue.set(this.percent,i,this.payment[i]/allCount);
+					}
+				},
+
+				drawCircle:function(){
+				        var circle=document.getElementById("circle");
+				        var color=["#F44C53","#EC48BD","#464AEB","#1B9382"];
+
+				        if(circle.getContext){
+				       	    circle=circle.getContext("2d");
+				          	circle.translate(100,100);
+				            if(this.percent!=[]){
+				                var start=0,end=0,oNum;
+				    	        for(var i=0,len=this.percent.length;i<len;i++){
+				                    circle.beginPath();
+				                    circle.moveTo(0,0);
+				                    end+=this.percent[i]*2*Math.PI;
+				                    circle.arc(0,0,98,start,end,false);
+				                    circle.fillStyle=color[i];
+				                    circle.fill();
+				                    circle.closePath();
+				                    start=end;
+			                    }
+			                }
+			                else{
+			            	    circle.textAlign="center";
+			            	    circle.textBaseline="middle";
+			            	    circle.font="20px Arial";
+			            	    circle.fillText("无支出记录",0,0);
+			            	}
+			   		    }
+			    },
+
+			    drawLineChat:function(){
+			    	var oDate=new Date();
+			    	var thisYear=oDate.getFullYear();
+			    	var thisMonth=oDate.getMonth()+1; 
+
+			    	//取画布
+			    	var lineChat=document.getElementById("line-chat");
+			    	if(lineChat.getContext)
+			    	lineChat=lineChat.getContext("2d");
+			        lineChat.translate(70,200);
+
+			        //画坐标轴//
+			        lineChat.beginPath;
+			        lineChat.moveTo(0,0);
+			        lineChat.lineTo(0,-200);
+			        lineChat.moveTo(0,0);
+			        lineChat.lineTo(200,0);
+			        lineChat.strokeStyle="#000";
+			        lineChat.stroke();
+			        lineChat.closePath;
+
+			        //画虚线
+			        lineChat.beginPath;
+			        for(var i=0,j=40;i<4;i++,j+=40){
+			        	lineChat.moveTo(j,0);
+			        	for(var k=0;k<200;k+=10){
+			        	   lineChat.moveTo(j,-k)
+			               lineChat.lineTo(j,-k-5);
+			               lineChat.stroke();
+			        	}
+			        }
+			        lineChat.closePath;
+
+			        //画X轴数据
+			        lineChat.textAlign="center";
+			        lineChat.textBaseline="middle";
+			        // lineChat.font="20px Arial";
+			        for(var i=0,j=0;i<5;i++,j+=40){
+			            lineChat.fillText((thisMonth-2+i)+"月",j,10);
+			            // if(dateArr[thisYear]!=undefined && dateArr[thisYear][String(thisMonth-2+i)]!=undefined)
+			        	
+			        }
+
+			        //处理Y轴数据
+			        var compArr=new Array();
+			        for(var i=0;i<5;i++){
+			        	if(this.dateArr[thisYear]!=undefined && this.dateArr[thisYear][String(thisMonth-2+i)]!=undefined)
+			                compArr.push(this.dateArr[thisYear][String(thisMonth-2+i)]["money"]);
+			        }
+			        if(compArr.length>0){
+			           var maxIncome=Math.max.apply(null,compArr);
+			           var digit=Math.pow(10,String(maxIncome).split("").length-1)
+			           var maxNumber=digit*Math.ceil(maxIncome/digit);
+			           var section=maxNumber/180;
+			        }
+			        else maxNumber=0;
+
+			        //画Y轴数据
+			        lineChat.textAlign="end";
+			        for(var i=0,j=0;i<6;i++,j+=36){
+			        	lineChat.fillText(maxNumber*(i)/5,-5,-j);
+			        }
+			        lineChat.textAlign="center";
+			        lineChat.fillText("(元)",-10,-193);
+
+			         //画折线
+			        lineChat.beginPath;
+			        for(var i=0,j=0;i<5;i++,j+=40){
+			        	if(this.dateArr[thisYear]!=undefined && this.dateArr[thisYear][String(thisMonth-2+i)]!=undefined)
+			        	    lineChat.moveTo(j,-this.dateArr[thisYear][String(thisMonth-2+i)]["money"]/section);
+			        	else lineChat.moveTo(j,-0);
+
+			        	if(this.dateArr[thisYear]!=undefined && this.dateArr[thisYear][String(thisMonth-1+i)]!=undefined)
+			        	    lineChat.lineTo(j+40,-this.dateArr[thisYear][String(thisMonth-1+i)]["money"]/section);  
+			        	else lineChat.moveTo(j+40,0);  	
+			        	
+			        }
+			        lineChat.fill();
+			        lineChat.stroke();
+			        lineChat.closePath;	    
+				}
+			},
+            template:`
+                <div id="container" class="text-center">
+                    <div class="row">
+                        <div class="flex-center">
+                        <span>支出占比图</span>
+                        <ul class="row text-center flex-row-center" id="event-type-list">
+                            <li class="event-type"><span style="background-color:#F44C53"></span>饮食{{percentCache[0]}}%</li>
+                            <li class="event-type"><span style="background-color:#EC48BD"></span>日用{{percentCache[1]}}%</li>
+                            <li class="event-type"><span style="background-color:#464AEB"></span>文娱{{percentCache[2]}}%</li>
+                            <li class="event-type"><span style="background-color:#1B9382"></span>其他{{percentCache[3]}}%</li>
+                        </ul>
+                        <canvas id="circle" height="200px" width="200px"></canvas>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="flex-center">
+                            <span>月收入折线图</span>
+                            <ul id="income-list"></ul>
+                            <canvas id="line-chat" height="230px" width="270px"></canvas>
+                        </div>
+                    </div>
+                    </div>`,
+		};
+
+    	var accountApp=new Vue({
+    		el:"#account-app",
+    		data:{
+    			currentPage:"indexOfApp",
+    			account:[],
+    			isEjectMenu:false,
+    		},
+    		created:function(){
+    			this.reloadPage();
+    			this.$on("reload-page",this.reloadPage);
+    			this.$on("switch-page",this.switchPage);
+    			this.$on("eject-menu",this.ejectMenu);
+    		},
+    		methods:{
+    			reloadPage:function(){											
+    				this.account=JSON.parse(localStorage.getItem("account"));
+    			},
+    			switchPage:function(val){	
+    				if(val=="accountList"){
+    					this.currentPage="indexOfApp";
+    					this.$refs.statusBar.$data.isAdd=true;
+    				}
+    				else if(val=="accountStatistics"){
+    					this.currentPage='showAccount';
+    					this.$refs.statusBar.$data.isAdd=true;
+    				}
+    		    	else if(val="addAccount"){
+    		    		this.currentPage="addAccount";
+    		    		this.$refs.statusBar.$data.isAdd=false;
+    		    	}
+    		    },
+    		    ejectMenu:function(val){
+    		    	if(typeof val=="boolean")
+    		    		this.isEjectMenu=val;
+    		    	else 
+    		    		this.isEjectMenu=val.val
+    	    	}
+    	    	// swipeLeft:function(){
+    	    	// 	this.isEjectMenu=false;
+    	    	// },
+    	    	// swipeRight:function(){
+    	    	// 	this.isEjectMenu=true;
+    	    	// }
+    	    },
+    		components:{
+    			addAccount,showAccount,indexOfApp,statusBar,leftMenu,bgMenu
+    		}
+    	});
+    </script>
+</body>
+</html>
